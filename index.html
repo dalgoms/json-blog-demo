@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, sans-serif; background: #F4F5F7; color: #191F28; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+        /* ── Header ── */
+        .header { padding: 16px 0; background: #fff; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #F0F1F4; }
+        .header-inner { max-width: 1060px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+        .header-logo { font-size: 17px; font-weight: 700; color: #191F28; letter-spacing: -0.5px; cursor: pointer; }
+        .header-logo span { color: #3182F6; }
+        .header-tag { font-size: 12px; color: #6B7684; background: #F2F4F6; padding: 5px 12px; border-radius: 8px; font-weight: 600; letter-spacing: -0.2px; }
+
+        /* ── Hero ── */
+        .hero { padding: 72px 24px 56px; max-width: 1060px; margin: 0 auto; }
+        .hero-eyebrow { font-size: 14px; font-weight: 600; color: #3182F6; letter-spacing: -0.2px; margin-bottom: 16px; }
+        .hero-title { font-size: clamp(32px, 5vw, 48px); font-weight: 800; color: #191F28; letter-spacing: -1.5px; line-height: 1.3; margin-bottom: 16px; }
+        .hero-title span { color: #3182F6; }
+        .hero-desc { font-size: 17px; color: #8B95A1; line-height: 1.7; max-width: 480px; letter-spacing: -0.3px; }
+
+        /* ── Post Grid ── */
+        .posts { max-width: 1060px; margin: 0 auto; padding: 0 24px 80px; }
+        .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+        .post-card { background: #fff; border-radius: 16px; overflow: hidden; transition: transform 0.25s ease, box-shadow 0.25s ease; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .post-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+        .post-card-img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; }
+        .post-card-body { padding: 20px 22px 24px; }
+        .post-card-category { display: inline-block; font-size: 12px; font-weight: 700; color: #3182F6; background: #EBF3FE; padding: 4px 10px; border-radius: 6px; margin-bottom: 14px; letter-spacing: -0.2px; }
+        .post-card-title { font-size: 17px; font-weight: 700; color: #191F28; letter-spacing: -0.4px; line-height: 1.5; margin-bottom: 10px; word-break: keep-all; }
+        .post-card-summary { font-size: 14px; color: #8B95A1; line-height: 1.65; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; letter-spacing: -0.2px; }
+        .post-card-footer { display: flex; align-items: center; justify-content: space-between; }
+        .post-card-date { font-size: 13px; color: #B0B8C1; font-weight: 500; letter-spacing: -0.2px; }
+        .post-card-arrow { font-size: 14px; color: #3182F6; font-weight: 600; opacity: 0; transition: opacity 0.2s; }
+        .post-card:hover .post-card-arrow { opacity: 1; }
+
+        /* ── Article Page (Full-screen overlay) ── */
+        .article-page { position: fixed; inset: 0; z-index: 200; background: #fff; overflow-y: auto; transform: translateY(100%); opacity: 0; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; pointer-events: none; }
+        .article-page.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+        .article-header { position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #F0F1F4; }
+        .article-header-inner { max-width: 720px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .article-back { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: #333D4B; cursor: pointer; background: none; border: none; padding: 6px 10px 6px 4px; border-radius: 8px; transition: background 0.15s; letter-spacing: -0.3px; }
+        .article-back:hover { background: #F2F4F6; }
+        .article-back svg { width: 20px; height: 20px; }
+        .article-share { display: flex; gap: 8px; }
+        .article-share-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #E5E8EB; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; color: #6B7684; font-size: 16px; }
+        .article-share-btn:hover { background: #F2F4F6; }
+
+        .article-hero { max-width: 720px; margin: 0 auto; padding: 48px 24px 0; }
+        .article-category { display: inline-block; font-size: 13px; font-weight: 700; color: #3182F6; margin-bottom: 20px; letter-spacing: -0.2px; }
+        .article-title { font-size: clamp(26px, 4vw, 36px); font-weight: 800; color: #191F28; letter-spacing: -1.2px; line-height: 1.4; margin-bottom: 20px; word-break: keep-all; }
+        .article-meta { display: flex; align-items: center; gap: 12px; padding-bottom: 32px; border-bottom: 1px solid #F0F1F4; }
+        .article-meta-date { font-size: 14px; color: #8B95A1; font-weight: 500; letter-spacing: -0.2px; }
+        .article-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: #D1D6DB; }
+        .article-meta-author { font-size: 14px; color: #8B95A1; font-weight: 500; letter-spacing: -0.2px; }
+
+        .article-thumbnail { max-width: 720px; margin: 0 auto; padding: 32px 24px 0; }
+        .article-thumbnail img { width: 100%; border-radius: 14px; display: block; aspect-ratio: 16/9; object-fit: cover; }
+
+        .article-summary { max-width: 720px; margin: 0 auto; padding: 32px 24px 0; }
+        .article-summary-box { background: #F8F9FA; border-radius: 12px; padding: 24px 28px; }
+        .article-summary-title { font-size: 14px; font-weight: 700; color: #333D4B; margin-bottom: 14px; letter-spacing: -0.3px; }
+        .article-summary-text { font-size: 15px; color: #4E5968; line-height: 1.75; letter-spacing: -0.2px; }
+
+        .article-body { max-width: 720px; margin: 0 auto; padding: 40px 24px 0; }
+        .article-body p { font-size: 17px; color: #333D4B; line-height: 1.9; letter-spacing: -0.2px; margin-bottom: 28px; word-break: keep-all; }
+        .article-body p:last-child { margin-bottom: 0; }
+
+        .article-tags { max-width: 720px; margin: 0 auto; padding: 48px 24px 0; display: flex; flex-wrap: wrap; gap: 8px; }
+        .article-tag { font-size: 13px; font-weight: 600; color: #6B7684; background: #F2F4F6; padding: 6px 14px; border-radius: 8px; letter-spacing: -0.2px; }
+
+        .article-divider { max-width: 720px; margin: 48px auto 0; padding: 0 24px; }
+        .article-divider hr { border: none; border-top: 1px solid #F0F1F4; }
+
+        .article-author { max-width: 720px; margin: 0 auto; padding: 32px 24px; display: flex; align-items: center; gap: 16px; }
+        .article-author-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #3182F6, #6DB5F5); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: 700; flex-shrink: 0; }
+        .article-author-info { }
+        .article-author-name { font-size: 15px; font-weight: 700; color: #191F28; letter-spacing: -0.3px; margin-bottom: 4px; }
+        .article-author-desc { font-size: 13px; color: #8B95A1; line-height: 1.5; letter-spacing: -0.2px; }
+
+        .article-footer { max-width: 720px; margin: 0 auto; padding: 0 24px 80px; }
+        .article-footer-cta { background: #F8F9FA; border-radius: 16px; padding: 32px; text-align: center; }
+        .article-footer-cta-text { font-size: 16px; font-weight: 600; color: #333D4B; margin-bottom: 16px; letter-spacing: -0.3px; word-break: keep-all; }
+        .article-footer-cta-btn { display: inline-block; background: #3182F6; color: #fff; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 10px; text-decoration: none; letter-spacing: -0.2px; transition: background 0.2s; cursor: pointer; border: none; }
+        .article-footer-cta-btn:hover { background: #1B6CE5; }
+
+        /* ── JSON Badge ── */
+        .json-badge { position: fixed; bottom: 24px; right: 24px; background: #fff; color: #8B95A1; padding: 10px 18px; border-radius: 12px; font-size: 12px; font-weight: 600; z-index: 50; letter-spacing: -0.2px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .json-badge span { color: #3182F6; font-family: 'SF Mono', 'Fira Code', monospace; }
+
+        /* ── Responsive ── */
+        @media (max-width: 1024px) {
+            .posts-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            body { background: #fff; }
+            .header { border-bottom-color: #F0F1F4; }
+            .hero { padding: 48px 20px 36px; }
+            .hero-title { font-size: 28px; letter-spacing: -1px; }
+            .hero-desc { font-size: 15px; }
+            .posts { padding: 0 20px 80px; }
+            .posts-grid { grid-template-columns: 1fr; gap: 16px; }
+            .post-card { box-shadow: none; border: 1px solid #F0F1F4; border-radius: 14px; }
+            .post-card:hover { transform: none; box-shadow: none; }
+            .header-inner { padding: 0 20px; }
+            .json-badge { bottom: 16px; right: 16px; padding: 8px 14px; font-size: 11px; }
+            .article-hero { padding: 36px 20px 0; }
+            .article-title { font-size: 24px; letter-spacing: -0.8px; }
+            .article-thumbnail { padding: 24px 20px 0; }
+            .article-thumbnail img { border-radius: 12px; }
+            .article-summary { padding: 28px 20px 0; }
+            .article-summary-box { padding: 20px 22px; }
+            .article-body { padding: 32px 20px 0; }
+            .article-body p { font-size: 16px; }
+            .article-tags { padding: 40px 20px 0; }
+            .article-divider { padding: 0 20px; }
+            .article-author { padding: 28px 20px; }
+            .article-footer { padding: 0 20px 60px; }
+            .article-footer-cta { padding: 28px 24px; }
+            .article-header-inner { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header" id="main-header">
+    <div class="header-inner">
+        <p class="header-logo" id="blog-title"><span>{</span> Blog <span>}</span></p>
+        <span class="header-tag">posts.json</span>
+    </div>
+</header>
+
+<section class="hero" id="main-hero">
+    <p class="hero-eyebrow">No Database. No Server. Just JSON.</p>
+    <h1 class="hero-title" id="hero-title">JSON 하나로<br>운영하는 <span>블로그</span></h1>
+    <p class="hero-desc" id="hero-desc">DB 없이, 서버 없이, 텍스트 파일 하나로 콘텐츠를 관리합니다.</p>
+</section>
+
+<main class="posts" id="main-posts">
+    <div class="posts-grid" id="posts-grid"></div>
+</main>
+
+<!-- Article Detail Page -->
+<div class="article-page" id="article-page">
+    <header class="article-header">
+        <div class="article-header-inner">
+            <button class="article-back" id="article-back">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                목록으로
+            </button>
+            <div class="article-share">
+                <button class="article-share-btn" title="공유">🔗</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="article-hero">
+        <p class="article-category" id="article-category"></p>
+        <h1 class="article-title" id="article-title"></h1>
+        <div class="article-meta">
+            <span class="article-meta-date" id="article-date"></span>
+            <span class="article-meta-dot"></span>
+            <span class="article-meta-author">by { Blog }</span>
+        </div>
+    </div>
+
+    <div class="article-thumbnail">
+        <img id="article-thumbnail-img" src="" alt="">
+    </div>
+
+    <div class="article-summary">
+        <div class="article-summary-box">
+            <p class="article-summary-title">📌 이 글의 요약</p>
+            <p class="article-summary-text" id="article-summary"></p>
+        </div>
+    </div>
+
+    <div class="article-body" id="article-body"></div>
+
+    <div class="article-tags" id="article-tags"></div>
+
+    <div class="article-divider"><hr></div>
+
+    <div class="article-author">
+        <div class="article-author-avatar">B</div>
+        <div class="article-author-info">
+            <p class="article-author-name">{ Blog } 에디터</p>
+            <p class="article-author-desc">JSON 하나로 운영하는 블로그. 개발 없이 콘텐츠를 관리하는 방법을 공유합니다.</p>
+        </div>
+    </div>
+
+    <div class="article-footer">
+        <div class="article-footer-cta">
+            <p class="article-footer-cta-text">도움이 되셨나요? 더 많은 콘텐츠를 확인해 보세요</p>
+            <button class="article-footer-cta-btn" id="article-cta-btn">목록으로 돌아가기</button>
+        </div>
+    </div>
+</div>
+
+<div class="json-badge">powered by <span>posts.json</span></div>
+
+<script>
+fetch('posts.json')
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        document.title = data.blog.title;
+
+        var grid = document.getElementById('posts-grid');
+        data.posts.forEach(function(post) {
+            var card = document.createElement('div');
+            card.className = 'post-card';
+            card.innerHTML =
+                '<img class="post-card-img" src="' + post.thumbnail + '" alt="' + post.title + '" loading="lazy">' +
+                '<div class="post-card-body">' +
+                    '<p class="post-card-category">' + post.category + '</p>' +
+                    '<h3 class="post-card-title">' + post.title + '</h3>' +
+                    '<p class="post-card-summary">' + post.summary + '</p>' +
+                    '<div class="post-card-footer">' +
+                        '<span class="post-card-date">' + post.date + '</span>' +
+                        '<span class="post-card-arrow">→</span>' +
+                    '</div>' +
+                '</div>';
+            card.addEventListener('click', function() {
+                openArticle(post);
+            });
+            grid.appendChild(card);
+        });
+    });
+
+function openArticle(post) {
+    document.getElementById('article-category').textContent = post.category;
+    document.getElementById('article-title').textContent = post.title;
+    document.getElementById('article-date').textContent = post.date;
+    document.getElementById('article-summary').textContent = post.summary;
+    document.getElementById('article-thumbnail-img').src = post.thumbnail;
+    document.getElementById('article-thumbnail-img').alt = post.title;
+
+    var body = document.getElementById('article-body');
+    body.innerHTML = '';
+    var paragraphs = post.content.split('\n\n');
+    paragraphs.forEach(function(text) {
+        if (text.trim()) {
+            var p = document.createElement('p');
+            p.textContent = text.trim();
+            body.appendChild(p);
+        }
+    });
+
+    var tags = document.getElementById('article-tags');
+    tags.innerHTML = '';
+    var tagList = [post.category, 'JSON', '블로그', '콘텐츠 관리'];
+    tagList.forEach(function(t) {
+        var el = document.createElement('span');
+        el.className = 'article-tag';
+        el.textContent = t;
+        tags.appendChild(el);
+    });
+
+    var page = document.getElementById('article-page');
+    page.classList.add('open');
+    page.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+}
+
+function closeArticle() {
+    document.getElementById('article-page').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('article-back').addEventListener('click', closeArticle);
+document.getElementById('article-cta-btn').addEventListener('click', closeArticle);
+</script>
+
+</body>
+</html>
