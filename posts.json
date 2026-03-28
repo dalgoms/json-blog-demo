@@ -1,12 +1,12 @@
 {
   "blog": {
-    "title": "My Blog",
-    "description": "JSON 하나로 운영하는 블로그"
+    "title": "Blog Tech",
+    "description": "JSON 하나로 운영하는 블로그 ✍️"
   },
   "posts": [
     {
       "id": 1,
-      "title": "JSON으로 블로그를 운영할 수 있다고?",
+      "title": "JSON으로 블로그를 운영할 수 있다고? 정말일까?",
       "date": "2026-03-28",
       "category": "인사이트",
       "thumbnail": "images/thumb-1.png",
