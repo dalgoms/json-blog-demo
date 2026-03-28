@@ -6,6 +6,7 @@
     <title>My Blog</title>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, sans-serif; background: #F4F5F7; color: #191F28; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -72,6 +73,18 @@
         .article-body { max-width: 720px; margin: 0 auto; padding: 40px 24px 0; }
         .article-body p { font-size: 17px; color: #333D4B; line-height: 1.9; letter-spacing: -0.2px; margin-bottom: 28px; word-break: keep-all; }
         .article-body p:last-child { margin-bottom: 0; }
+        .article-body h2 { font-size: 22px; font-weight: 700; color: #191F28; margin: 48px 0 16px; letter-spacing: -0.5px; }
+        .article-body h3 { font-size: 19px; font-weight: 700; color: #333D4B; margin: 36px 0 12px; letter-spacing: -0.3px; }
+        .article-body img { width: 100%; border-radius: 12px; margin: 24px 0; display: block; }
+        .article-body ul, .article-body ol { padding-left: 24px; margin-bottom: 28px; }
+        .article-body li { font-size: 17px; color: #333D4B; line-height: 1.9; margin-bottom: 8px; letter-spacing: -0.2px; }
+        .article-body blockquote { border-left: 3px solid #3182F6; background: #F8F9FA; margin: 24px 0; padding: 16px 20px; border-radius: 0 10px 10px 0; }
+        .article-body blockquote p { color: #4E5968; margin-bottom: 0; }
+        .article-body code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 14px; background: #F2F4F6; color: #3182F6; padding: 2px 8px; border-radius: 5px; }
+        .article-body pre { background: #1B1D21; color: #E5E8EB; padding: 20px 24px; border-radius: 12px; margin: 24px 0; overflow-x: auto; }
+        .article-body pre code { background: none; color: inherit; padding: 0; font-size: 14px; line-height: 1.7; }
+        .article-body strong { font-weight: 700; color: #191F28; }
+        .article-body hr { border: none; border-top: 1px solid #F0F1F4; margin: 40px 0; }
 
         .article-tags { max-width: 720px; margin: 0 auto; padding: 48px 24px 0; display: flex; flex-wrap: wrap; gap: 8px; }
         .article-tag { font-size: 13px; font-weight: 600; color: #6B7684; background: #F2F4F6; padding: 6px 14px; border-radius: 8px; letter-spacing: -0.2px; }
@@ -207,8 +220,12 @@
 <div class="json-badge">powered by <span>posts.json</span></div>
 
 <script>
-fetch('posts.json')
-    .then(function(res) { return res.json(); })
+fetch('/api/posts')
+    .then(function(res) {
+        if (!res.ok) throw new Error('API failed');
+        return res.json();
+    })
+    .catch(function() { return fetch('posts.json').then(function(r) { return r.json(); }); })
     .then(function(data) {
         document.title = data.blog.title;
 
@@ -243,15 +260,7 @@ function openArticle(post) {
     document.getElementById('article-thumbnail-img').alt = post.title;
 
     var body = document.getElementById('article-body');
-    body.innerHTML = '';
-    var paragraphs = post.content.split('\n\n');
-    paragraphs.forEach(function(text) {
-        if (text.trim()) {
-            var p = document.createElement('p');
-            p.textContent = text.trim();
-            body.appendChild(p);
-        }
-    });
+    body.innerHTML = marked.parse(post.content);
 
     var tags = document.getElementById('article-tags');
     tags.innerHTML = '';
