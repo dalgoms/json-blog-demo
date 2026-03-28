@@ -1,7 +1,7 @@
 {
   "blog": {
     "title": "Blog Tech",
-    "description": "JSON 하나로 운영하는 블로그 ✍️"
+    "description": "JSON 하나로 운영하는 블로그"
   },
   "posts": [
     {
