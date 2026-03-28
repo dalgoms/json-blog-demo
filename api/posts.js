@@ -39,13 +39,7 @@ module.exports = async (req, res) => {
       posts,
     });
   } catch (err) {
-    console.error('Notion API error:', err.message, err.code);
-    res.status(500).json({
-      error: 'Failed to fetch from Notion',
-      detail: err.message,
-      hasKey: !!process.env.NOTION_API_KEY,
-      hasDb: !!process.env.NOTION_DATABASE_ID,
-      keyLen: (process.env.NOTION_API_KEY || '').trim().length,
-    });
+    console.error('Notion API error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch from Notion' });
   }
 };
