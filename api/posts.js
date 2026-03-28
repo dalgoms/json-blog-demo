@@ -1,7 +1,7 @@
 const { Client } = require('@notionhq/client');
 
-const notion = new Client({ auth: process.env.NOTION_API_KEY });
-const databaseId = process.env.NOTION_DATABASE_ID;
+const notion = new Client({ auth: (process.env.NOTION_API_KEY || '').trim() });
+const databaseId = (process.env.NOTION_DATABASE_ID || '').trim();
 
 function getRichText(prop) {
   if (!prop || !prop.rich_text || !prop.rich_text.length) return '';
@@ -39,7 +39,13 @@ module.exports = async (req, res) => {
       posts,
     });
   } catch (err) {
-    console.error('Notion API error:', err.message);
-    res.status(500).json({ error: 'Failed to fetch from Notion' });
+    console.error('Notion API error:', err.message, err.code);
+    res.status(500).json({
+      error: 'Failed to fetch from Notion',
+      detail: err.message,
+      hasKey: !!process.env.NOTION_API_KEY,
+      hasDb: !!process.env.NOTION_DATABASE_ID,
+      keyLen: (process.env.NOTION_API_KEY || '').trim().length,
+    });
   }
 };
